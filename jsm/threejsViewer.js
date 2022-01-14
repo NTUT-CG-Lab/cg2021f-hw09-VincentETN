@@ -69,28 +69,46 @@ class threejsViewer {
             this.camera.updateProjectionMatrix();
         })
 
+        this.mesh = null
+
         this.updateModel = () => {
             // geometry + material => mesh
             let mesh = this.scene.getObjectByName("mesh")
             
-            if(mesh === undefined || mesh === null) {
+            if(mesh == undefined || mesh == null) {
                 //初始化
-                mesh = new MarchingCubes(this.size)
-                mesh.name = "mesh"
-                mesh.material = new THREE.MeshPhongMaterial({ color: 0xbbddff })
+                this.mesh = new MarchingCubes(this.size)
+                this.mesh.name = "mesh"
+                if (this.textureOption == 0) {
+                    this.mesh.material = new THREE.MeshPhongMaterial({ color: 0xffff00 })
+                } else if (this.textureOption == 1) {
+                    this.mesh.material = new THREE.MeshToonMaterial({ color: 0xffff00 })
+                } else if (this.textureOption == 2) {
+                    this.mesh.material = new THREE.MeshNormalMaterial({ color: 0xffff00 })
+                }
+                
+                this.mesh.isolation = this.threshold
+                this.mesh.field = this.databuffer
+                this.mesh.position.set(0, 1, 0)
+
+                this.scene.add(this.mesh)
+            }else{
+                if (this.textureOption == 0) {
+                    mesh.material = new THREE.MeshPhongMaterial({ color: 0xffff00 })
+                } else if (this.textureOption == 1) {
+                    mesh.material = new THREE.MeshToonMaterial({ color: 0xffff00 })
+                } else if (this.textureOption == 2) {
+                    mesh.material = new THREE.MeshNormalMaterial({ color: 0xffff00 })
+                }
+
+                mesh.isolation = this.threshold
+                mesh.field = this.databuffer
+                mesh.position.set(0, 1, 0)
             }
-
-            mesh.isolation = this.threshold
-            mesh.field = this.databuffer
-
-            mesh.position.set(0, 1, 0)
-            this.scene.add(mesh)
         }
 
         this.download = () => {
-            let mesh = this.scene.getObjectByName("mesh")
-            mesh.generateGeometry()
-            return mesh
+            return new THREE.Mesh(this.mesh.generateGeometry())
         }
 
         this.renderScene()
